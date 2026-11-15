@@ -2,8 +2,7 @@
  * Server-side Meteomatics weather client for EarthPulse.
  *
  * Reads Basic-auth credentials from METEOMATICS_USERNAME / METEOMATICS_PASSWORD.
- * When credentials are missing or the upstream call fails, falls back to mock
- * data so the demo stays functional (source is flagged in the response).
+ * Live weather is required; missing credentials or upstream failures are surfaced.
  */
 import type { MeteomaticsResponse, WeatherData } from "@/types/weather";
 
@@ -15,7 +14,7 @@ export interface GeoLocation {
   lon: number;
 }
 
-/** Default demo location: Kuala Lumpur. */
+/** Initial live-weather location: Kuala Lumpur. */
 export const DEFAULT_LOCATION: GeoLocation = {
   name: "Kuala Lumpur",
   lat: 3.139,
@@ -72,7 +71,9 @@ export async function fetchWeather(
   const password = process.env.METEOMATICS_PASSWORD;
 
   if (!username || !password) {
-    return mockWeather(location, "Missing Meteomatics credentials");
+    throw new Error(
+      "Live weather is not configured. Add METEOMATICS_USERNAME and METEOMATICS_PASSWORD to your Vercel project environment variables, then redeploy.",
+    );
   }
 
   const auth = Buffer.from(`${username}:${password}`).toString("base64");
@@ -86,38 +87,19 @@ export async function fetchWeather(
   });
 
   if (!res.ok) {
-    return mockWeather(
-      location,
-      `Meteomatics API returned ${res.status} ${res.statusText}`,
-    );
+    if (res.status === 401 || res.status === 403) {
+      throw new Error(
+        "Meteomatics rejected the credentials. Check METEOMATICS_USERNAME and METEOMATICS_PASSWORD in your deployment environment.",
+      );
+    }
+    throw new Error(`Meteomatics weather request failed (${res.status}).`);
   }
 
   const json = (await res.json()) as MeteomaticsResponse;
   const weather = extractWeather(json, location);
   if (!weather) {
-    return mockWeather(location, "Unexpected Meteomatics response shape");
+    throw new Error("Meteomatics returned an incomplete weather response.");
   }
 
   return weather;
-}
-
-/**
- * Demo fallback that mirrors the documented Meteomatics response shape.
- * Used only when the live API is unavailable (hackathon demo resilience).
- */
-function mockWeather(location: GeoLocation, reason: string): WeatherData {
-  if (process.env.NODE_ENV !== "production") {
-    console.warn(`[earthpulse] falling back to mock data: ${reason}`);
-  }
-  return {
-    location: location.name,
-    lat: location.lat,
-    lon: location.lon,
-    temperature: 27.4,
-    humidity: 84,
-    windSpeed: 3.2,
-    unit: "C",
-    observedAt: new Date().toISOString(),
-    source: "mock",
-  };
 }

@@ -41,7 +41,7 @@ export interface WeatherData {
   windSpeed: number;
   unit: "C";
   observedAt: string;
-  source: "meteomatics" | "mock";
+  source: "meteomatics";
 }
 
 /** A geocoded location returned by /api/geocode. */

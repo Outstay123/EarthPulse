@@ -26,25 +26,18 @@ import {
 } from "@/lib/gameData";
 import type { GeoSearchResult, WeatherData } from "@/types/weather";
 
-/** Initial demo data (Kuala Lumpur) shown before the first search. */
-const INITIAL_WEATHER: WeatherData = {
-  location: "Kuala Lumpur",
+const INITIAL_LOCATION = {
+  name: "Kuala Lumpur",
   lat: 3.139,
   lon: 101.6869,
-  temperature: 27.4,
-  humidity: 84,
-  windSpeed: 3.2,
-  unit: "C",
-  observedAt: "2026-11-14T00:52:03Z",
-  source: "meteomatics",
 };
 
 /** Compare flow states: picking A, picking B, or comparing (modal open). */
 type ComparePhase = "off" | "pickA" | "pickB" | "comparing";
 
 export default function Home() {
-  const [weather, setWeather] = useState<WeatherData>(INITIAL_WEATHER);
-  const [isLoading, setIsLoading] = useState(false);
+  const [weather, setWeather] = useState<WeatherData | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [layers] = useState<SoundscapeLayers>({
@@ -119,6 +112,23 @@ export default function Home() {
     },
     [],
   );
+
+  useEffect(() => {
+    let cancelled = false;
+    const loadInitialWeather = async () => {
+      await Promise.resolve();
+      const snapshot = await fetchWeatherFor(
+        INITIAL_LOCATION.lat,
+        INITIAL_LOCATION.lon,
+        INITIAL_LOCATION.name,
+      );
+      if (!cancelled && snapshot) setWeather(snapshot);
+    };
+    void loadInitialWeather();
+    return () => {
+      cancelled = true;
+    };
+  }, [fetchWeatherFor]);
 
   const resolveName = useCallback(async (lat: number, lon: number) => {
     try {
@@ -337,6 +347,46 @@ export default function Home() {
       : comparePhase === "pickB"
         ? "Compare: now pick Location B"
         : null;
+
+  if (!weather) {
+    return (
+      <main
+        className="flex min-h-screen items-center justify-center bg-slate-950 p-6 text-slate-100"
+        style={{ zoom: 0.8 }}
+      >
+        <section className="w-full max-w-md rounded-3xl border border-slate-700/70 bg-slate-900/80 p-6 text-center shadow-2xl">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.3em] text-sky-400">
+            EarthPulse
+          </p>
+          <h1 className="mt-2 text-xl font-semibold text-white">
+            {isLoading ? "Loading live weather…" : "Live weather unavailable"}
+          </h1>
+          <p className="mt-3 text-sm leading-relaxed text-slate-300">
+            {isLoading
+              ? "Connecting to Meteomatics for current conditions."
+              : error ?? "The live weather request failed. Check your connection and try again."}
+          </p>
+          {!isLoading && (
+            <button
+              type="button"
+              onClick={() =>
+                void fetchWeatherFor(
+                  INITIAL_LOCATION.lat,
+                  INITIAL_LOCATION.lon,
+                  INITIAL_LOCATION.name,
+                ).then((snapshot) => {
+                  if (snapshot) setWeather(snapshot);
+                })
+              }
+              className="mt-5 rounded-full border border-cyan-300/30 bg-cyan-400/10 px-5 py-2 text-sm font-semibold text-cyan-100 transition-colors hover:bg-cyan-400/20"
+            >
+              Retry live connection
+            </button>
+          )}
+        </section>
+      </main>
+    );
+  }
 
   return (
     <main

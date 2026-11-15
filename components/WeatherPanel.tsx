@@ -86,12 +86,8 @@ export default function WeatherPanel({
                 {weather.lat.toFixed(3)}°, {weather.lon.toFixed(3)}°
               </p>
             </div>
-            <span
-              className={`shrink-0 rounded-full bg-white/10 px-2.5 py-1 text-[10px] font-medium tracking-wide ${
-                weather.source === "mock" ? "text-amber-200" : "text-sky-200"
-              }`}
-            >
-              {weather.source === "mock" ? "DEMO" : "LIVE"}
+            <span className="shrink-0 rounded-full bg-white/10 px-2.5 py-1 text-[10px] font-medium tracking-wide text-sky-200">
+              LIVE · METEOMATICS
             </span>
           </div>
 

@@ -27,7 +27,12 @@ export async function GET(request: Request) {
   } catch (error) {
     console.error("[api/weather] failed to fetch weather:", error);
     return NextResponse.json<WeatherApiResponse>(
-      { error: "Failed to fetch weather data. Please try again." },
+      {
+        error:
+          error instanceof Error
+            ? error.message
+            : "Failed to fetch live weather data. Please try again.",
+      },
       { status: 502 },
     );
   }

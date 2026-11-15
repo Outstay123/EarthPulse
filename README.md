@@ -25,7 +25,7 @@ These are artistic mappings of current weather measurements, not direct recordin
 
 - Node.js 20.9 or newer
 - npm
-- Meteomatics API credentials for live weather (optional; the app can run with demo fallback data)
+- Meteomatics API credentials for live weather
 
 ### Setup
 
@@ -49,7 +49,7 @@ These are artistic mappings of current weather measurements, not direct recordin
    METEOMATICS_PASSWORD=your_meteomatics_password
    ```
 
-   The credentials are read by the server and are not exposed to the browser. No `NEXT_PUBLIC_` prefix is needed. If either value is missing, or Meteomatics cannot return usable data, EarthPulse uses clearly labeled demo weather instead.
+   The credentials are read by the server and are not exposed to the browser. No `NEXT_PUBLIC_` prefix is needed. Live weather is required; if credentials are missing or Meteomatics is unavailable, the app displays an error instead of substituting demo values.
 
 4. Start the development server:
 
