@@ -3,7 +3,7 @@
 > Explore weather around the world through sound. Listen to a climate-inspired soundscape, place your guess on the map, and learn how the measured conditions shaped the audio.
 
 <!-- Replace this with a link to a demo video or an image hosted in the repository. -->
-**Demo:** _https://drive.google.com/drive/u/0/my-drive_
+**Demo:** _https://drive.google.com/file/d/17iK-yzIJB6EWp-rMPx0RJkpcv2-CNFq-/view?usp=drive_link_
 
 **Website:** _https://earth-pulse-drab.vercel.app/_
 
