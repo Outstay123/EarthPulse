@@ -24,3 +24,44 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/* Audio pulse visualizer bars (Listen to Earth / Compare playback). */
+@keyframes eq-pulse {
+  0%,
+  100% {
+    height: 20%;
+  }
+  50% {
+    height: 100%;
+  }
+}
+
+.eq-bar {
+  height: 100%;
+  animation: eq-pulse 0.9s ease-in-out infinite;
+}
+
+.lab-range {
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+.lab-range::-webkit-slider-thumb {
+  width: 14px;
+  height: 14px;
+  appearance: none;
+  -webkit-appearance: none;
+  border: 2px solid #e2e8f0;
+  border-radius: 9999px;
+  background: var(--layer-color, #38bdf8);
+  box-shadow: 0 0 10px color-mix(in srgb, var(--layer-color, #38bdf8) 65%, transparent);
+}
+
+.lab-range::-moz-range-thumb {
+  width: 12px;
+  height: 12px;
+  border: 2px solid #e2e8f0;
+  border-radius: 9999px;
+  background: var(--layer-color, #38bdf8);
+  box-shadow: 0 0 10px color-mix(in srgb, var(--layer-color, #38bdf8) 65%, transparent);
+}
